@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-function authMiddleware(req, res, next) {
+function adminAuth(req, res, next) {
     try{
         let authHeader = req.headers.authorization;
 
@@ -14,6 +14,7 @@ function authMiddleware(req, res, next) {
         let decoded = jwt.verify(token, process.env.SECRET_KEY);
         if (decoded.userId) {
             req.userId = decoded.userId;
+            req.isAdmin = true;
             next();
         } else {
             return res.json({message: "Invalid User"});
@@ -26,5 +27,5 @@ function authMiddleware(req, res, next) {
 }
 
 module.exports = {
-    authMiddleware
+    adminAuth
 }

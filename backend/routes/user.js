@@ -5,10 +5,21 @@ const bcrypt = require('bcrypt');
 const { signUpBody, loginBody } = require('../types');
 const { User } = require('../models/User');
 const { fetchUser } = require('../controllers/fetchUser');
-const { authMiddleware } = require('../middlewares/authMiddleware');
+const { userAuth } = require('../middlewares/userAuth');
 
-router.get('/', (req, res) => {
-    res.send("This is working scenario");
+router.get('/me', userAuth, async (req, res) => {
+    try {
+        let user = await User.findOne({_id : req.userId});
+        if (user) {
+            res.status(200).json(user);
+            return;
+        } else {
+            res.status(500).json({message:"failed to fetch user"});
+        }
+    } catch (err) {
+        console.log(err);
+        res.json({message: "Api Call Failed"}); 
+    }
 });
 
 router.post('/signUp', async (req, res) => {
@@ -34,7 +45,7 @@ router.post('/signUp', async (req, res) => {
             name,
             email,
             phone,
-            password
+            password: hash
         })
 
         if (createdUser) {
@@ -92,7 +103,7 @@ router.post('/login', async (req, res) => {
     }
 });
 
-router.put('/edit', authMiddleware, async (req, res) => {
+router.put('/edit', userAuth, async (req, res) => {
     try {
         let edited = false;
         let userId = req.userId;
@@ -129,7 +140,7 @@ router.put('/edit', authMiddleware, async (req, res) => {
     }
 });
 
-router.delete('/delete', authMiddleware, async (req, res) => {
+router.delete('/delete', userAuth, async (req, res) => {
     try {
         let userId = req.userId;
         let {deletedCount} = await User.deleteOne({_id: userId});

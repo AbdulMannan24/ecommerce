@@ -1,0 +1,4 @@
+/*
+    crud products
+    get all and get a single product
+*/
