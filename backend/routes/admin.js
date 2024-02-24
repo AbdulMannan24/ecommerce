@@ -126,9 +126,10 @@ router.put('/edit', adminAuth, async (req, res) => {
     }
 });
 
+// fetching all users, excluding user passwords
 router.get('/allusers', adminAuth, async (req, res) => {
     try {
-        let users = await User.find();
+        let users = await User.find().select('-password');
         if (users.length > 0) {
             res.json(users);
         } else {

@@ -12,15 +12,15 @@ const orderSchema = mongoose.Schema({
     }, 
     total: {
         type: Number,
-        default: null
+        default: 0
     },
     status: {
         type: String,
-        default: null
+        default: "Delivered"
     },
     payment_id: {
         type: String,
-        default: null
+        default: Math.random() * 10000
     }
 }, {timestamps: true})
 

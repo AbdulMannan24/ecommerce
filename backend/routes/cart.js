@@ -50,6 +50,24 @@ router.post('/remove/:productId', userAuth, async (req, res) => {
     }
 });
 
+// empty cart
+router.post('/removeAll', userAuth, async (req, res)=> {
+    try {
+        let userId = req.userId;
+        let user = await User.findOne({_id: userId})
+        if (user) {
+            let cart = user.cart;
+            const products = await Product.deleteMany({ _id: { $in: cart } });
+            res.status(200).json({message: "All products Removed from Cart successfully"});
+        } else {
+            res.status(400).json({message: "failed to Remove Products from cart"});
+        } 
+    } catch (err) {
+        console.log(err);
+        res.json({message: "Api Call Failed"});   
+    }
+});
+
 router.get('/total', userAuth, async (req, res)=> {
     try {
         let userId = req.userId;

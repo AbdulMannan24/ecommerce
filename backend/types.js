@@ -14,13 +14,19 @@ const loginBody = {
 
 const orderBody = {
     cart_products : zod.array(zod.string()),
-    total: zod.number(),
+
     status: zod.string(),
     payment_id: zod.string()
+}
+
+const productBody = {
+    name: zod.string(),
+    price: zod.number()
 }
 
 module.exports = {
     signUpBody,
     loginBody,
-    orderBody
+    orderBody,
+    productBody
 }
