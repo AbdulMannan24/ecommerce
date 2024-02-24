@@ -8,8 +8,10 @@ const port = process.env.PORT || 3000;
 require('dotenv').config();
 app.use(express.json());
 app.use(cors());
+app.use(countRequests);
 
 const mainRouter = require('./routes/index');
+const { countRequests } = require('./middlewares/countRequests');
 app.use('/api/v1/', mainRouter);
 
 app.listen(port, ()=>{
