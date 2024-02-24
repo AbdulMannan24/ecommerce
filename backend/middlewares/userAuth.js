@@ -12,7 +12,7 @@ function userAuth(req, res, next) {
         
         let token = authHeader.split(' ')[1];
         let decoded = jwt.verify(token, process.env.SECRET_KEY);
-        if (decoded.userId) {
+        if (!decoded.isAdmin) {
             req.userId = decoded.userId;
             next();
         } else {

@@ -8,11 +8,11 @@ router.get('/', userAuth, async (req, res) => {
     try {
         let userId = req.userId;
         let userData = await User.findOne({_id: userId});
-        const cart = [];
+        let cart = [];
         if (userData) {
             cart = userData.cart;   
         } 
-        res.json(cart);
+        res.json({cart});
     } catch (err) {
         console.log(err);
         res.json({message: "Api Call Failed"});
@@ -22,10 +22,11 @@ router.get('/', userAuth, async (req, res) => {
 router.post('/add/:productId', userAuth, async (req, res) => {
     try {
         let userId = req.userId;
+        console.log(userId);
         let productId = req.params.productId;
         let user = await User.findOneAndUpdate({_id: userId}, {$push: {cart: productId}});
         if (user) {
-            res.status(200).json({message: "Product added successfully"});
+            res.status(200).json({message: "Product added to cart successfully"});
         } else {
             res.status(400).json({message: "failed to add product to cart"});
         }
@@ -58,7 +59,7 @@ router.post('/removeAll', userAuth, async (req, res)=> {
         let user = await User.findOne({_id: userId})
         if (user) {
             let cart = user.cart;
-            const products = await Product.deleteMany({ _id: { $in: cart } });
+            const products = await User.findOneAndUpdate({_id: userId},{cart: []});
             res.status(200).json({message: "All products Removed from Cart successfully"});
         } else {
             res.status(400).json({message: "failed to Remove Products from cart"});
@@ -76,9 +77,11 @@ router.get('/total', userAuth, async (req, res)=> {
         if (user) {
             let cart = user.cart;
             let total = 0;
-            const products = await Product.find({ _id: { $in: cart } });
-            for (let i = 0; i < products.length; i++) {
-                total += products[i].price;
+            // const products = await Product.find({ _id: { $in: cart } });
+            // console.log(products);
+            for (let i = 0; i < cart.length; i++) {
+                let product = await Product.findOne({ _id: cart[i]});
+                total += parseInt(product.price);
             }
             res.status(200).json({cartTotal : total});
         } else {

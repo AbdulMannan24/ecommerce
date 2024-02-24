@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const { Product } = require('../models/Product');
 const { adminAuth } = require('../middlewares/adminAuth');
 const { productBody } = require('../types');
@@ -7,14 +8,15 @@ const router = express.Router();
 // get all or a specific product
 router.get('/:id?', async (req, res) => {
     try {   
-        let productId = req.query.productId;
+        let productId = req.params.id;
         if (productId) {
             let product = await Product.findOne({_id: productId});
-            res.status(200).json(product);
+            console.log(product + ' is available');
+            res.status(200).json({product});
             return;
         } 
         let products = await Product.find();
-        res.status(200).json(products);        
+        res.status(200).json({products});        
     } catch (err) {
         console.log(err);
         res.status(400).json({message: "Api Call Failed"});
@@ -24,7 +26,7 @@ router.get('/:id?', async (req, res) => {
 // search product by name, fetches all products which contain the name even as a substring
 router.get('/search/:name', async (req, res) => {
     try {
-        let productName = req.query.name;
+        let productName = req.params.name;
         if (productName) {
             let products = await Product.find({ 
                 name: { 
@@ -34,7 +36,7 @@ router.get('/search/:name', async (req, res) => {
             });
 
             if (products.length > 0) {
-                res.status(200).json(products);
+                res.status(200).json({products});
             } else {
                 res.status(200).json({message: 'No products found'});
             }
@@ -83,6 +85,11 @@ router.put('/edit', adminAuth, async (req, res) => {
         let updatedBody = req.body;
         let productId = req.body.id;
         let updatedProduct = await Product.findOneAndUpdate({_id: productId}, {$set: updatedBody});
+        if (updatedProduct) {
+            res.status(200).json({message:"Product updated successfully"});
+        } else {
+            res.status(400).json({message: "Failed to update Product"});
+        }
     } catch (err) {
         console.log(err);
         res.status(400).json({message: "Api Call Failed"}); 
@@ -104,7 +111,7 @@ router.delete('/delete/:id', adminAuth, async (req, res) => {
         }
     } catch (err) {
         console.log(err);
-        res.status(400).json({message: "Api Call Failed"}); 
+        res.status(400).json({message: "Invalid product Id/ Product not found"}); 
     }
 });
 
