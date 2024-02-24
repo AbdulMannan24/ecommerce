@@ -14,4 +14,7 @@ router.use('/admin', adminRoutes);
 const cartRoutes = require('./cart');
 router.use('/cart', cartRoutes);
 
+const orderRoutes = require('./order');
+router.use('/order', orderRoutes);
+
 module.exports = router;
