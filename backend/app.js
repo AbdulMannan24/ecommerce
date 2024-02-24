@@ -2,6 +2,7 @@ const express = require('express');
 const connectDB = require('./db');
 const app = express();
 const cors = require('cors');
+const { countRequests } = require('./middlewares/countRequests');
 const port = process.env.PORT || 3000;
 
 // middlewares
@@ -11,7 +12,6 @@ app.use(cors());
 app.use(countRequests);
 
 const mainRouter = require('./routes/index');
-const { countRequests } = require('./middlewares/countRequests');
 app.use('/api/v1/', mainRouter);
 
 app.listen(port, ()=>{

@@ -6,5 +6,6 @@ function countRequests(req, res, next) {
 }
 
 module.exports = {
-    countRequests
+    countRequests,
+    totalRequests
 }

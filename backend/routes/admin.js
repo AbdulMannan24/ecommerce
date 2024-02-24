@@ -1,8 +1,12 @@
 const express = require('express');
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const { fetchAdmin } = require('../controllers/fetchAdmin');
 const { Admin } = require('../models/Admin');
 const { adminAuth } = require('../middlewares/adminAuth');
 const { User } = require('../models/User');
+const {signUpBody, loginBody} = require('../types');
 const router = express.Router();
 
 router.post('/signUp', async (req, res) => {
@@ -104,6 +108,7 @@ router.put('/edit', adminAuth, async (req, res) => {
         }
 
         if (req.body.password) {
+            let password = req.body.password;
             if (password.length >= 6) {
                 let salt = await bcrypt.genSalt(10);
                 let hash = await bcrypt.hash(password, salt);
@@ -141,16 +146,19 @@ router.get('/allusers', adminAuth, async (req, res) => {
     }
 });
 
-router.delete('/deleteUser/:id', adminAuth, async (req, res) => {
+router.delete('/deleteUser/:id?', adminAuth, async (req, res) => {
     try {
         let user = req.params.id;
+        user = new mongoose.Types.ObjectId(user);
         if (user) {
-            let {deletedCount} = await user.deleteOne({_id: user});
+            let {deletedCount} = await User.deleteOne({_id: user});
 
             if (deletedCount) {
                 res.json({message: "User deleted successfully"});
+                return;
             } else {
                 res.status(500).json({message: "failed to delete user"});
+                return;
             }
         }
         res.status(400).json({message: "Provide a valid User ID"});

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const zod = require('zod');
 const { signUpBody, loginBody } = require('../types');
 const { User } = require('../models/User');
 const { fetchUser } = require('../controllers/fetchUser');
@@ -9,7 +10,7 @@ const { userAuth } = require('../middlewares/userAuth');
 
 router.get('/me', userAuth, async (req, res) => {
     try {
-        let user = await User.findOne({_id : req.userId});
+        let user = await User.findOne({_id : req.userId}).select('-password');
         if (user) {
             res.status(200).json(user);
             return;
@@ -118,6 +119,7 @@ router.put('/edit', userAuth, async (req, res) => {
         }
 
         if (req.body.password) {
+            let password = req.body.password;
             if (password.length >= 6) {
                 let salt = await bcrypt.genSalt(10);
                 let hash = await bcrypt.hash(password, salt);
