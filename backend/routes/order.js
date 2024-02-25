@@ -10,9 +10,14 @@ router.get('/:id?', userAuth, async (req, res) => {
         let orderId = req.params.id;
         let userId = req.userId;
         if (orderId) {
+            let isValid = mongoose.Types.ObjectId.isValid(orderId);
+            if (!isValid) {
+                res.status(400).json({ message: 'Invalid Order Id'});
+                return;
+            }
             let orderData = await Order.findOne({_id: orderId});
             if (orderData) {
-                res.status(200).json(orderData);
+                res.status(200).json({orderData});
                 return;
             } else {
                 res.status(400).json({message: 'Order not found'});
@@ -21,7 +26,7 @@ router.get('/:id?', userAuth, async (req, res) => {
         } else {
             let orders = await Order.find({user_id: userId});
             if (orders) {
-                res.status(200).json(orders);
+                res.status(200).json({orders});
                 return;
             } else {
                 res.status(400).json({message: 'No orders found for the user'});
@@ -40,7 +45,8 @@ router.post('/create', userAuth, async (req, res) => {
         if (!success) {
             res.status(404).json({message:"Invalid Order Input"});
             return;
-        } 
+        }
+        let {cart_products, total, status, payment_id} = req.body;
         let order = await Order.create({
             user_id: req.userId,
             cart_products,

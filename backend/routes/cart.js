@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const { User } = require('../models/User');
 const { Product } = require('../models/Product');
 const { userAuth } = require('../middlewares/userAuth');
@@ -22,8 +23,12 @@ router.get('/', userAuth, async (req, res) => {
 router.post('/add/:productId', userAuth, async (req, res) => {
     try {
         let userId = req.userId;
-        console.log(userId);
         let productId = req.params.productId;
+        let isValid = mongoose.Types.ObjectId.isValid(productId);
+        if (!isValid) {
+            res.status(400).json({ message: 'Invalid Product Id'});
+            return;
+        }
         let user = await User.findOneAndUpdate({_id: userId}, {$push: {cart: productId}});
         if (user) {
             res.status(200).json({message: "Product added to cart successfully"});
@@ -40,6 +45,11 @@ router.post('/remove/:productId', userAuth, async (req, res) => {
     try {
         let userId = req.userId;
         let productId = req.params.productId;
+        let isValid = mongoose.Types.ObjectId.isValid(productId);
+        if (!isValid) {
+            res.status(400).json({ message: 'Invalid Product Id'});
+            return;
+        }
         let user = await User.findOneAndUpdate({_id: userId}, {$pull: {cart: productId}});
         if (user) {
             res.status(200).json({message: "Product Removed successfully"});

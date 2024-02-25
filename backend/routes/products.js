@@ -10,6 +10,11 @@ router.get('/:id?', async (req, res) => {
     try {   
         let productId = req.params.id;
         if (productId) {
+            let isValid = mongoose.Types.ObjectId.isValid(productId);
+            if (!isValid) {
+                res.status(400).json({ message: 'Invalid Product Id'});
+                return;
+            }
             let product = await Product.findOne({_id: productId});
             console.log(product + ' is available');
             res.status(200).json({product});
@@ -84,6 +89,11 @@ router.put('/edit', adminAuth, async (req, res) => {
     try {
         let updatedBody = req.body;
         let productId = req.body.id;
+        let isValid = mongoose.Types.ObjectId.isValid(productId);
+        if (!isValid) {
+            res.status(400).json({ message: 'Invalid Product Id'});
+            return;
+        }
         let updatedProduct = await Product.findOneAndUpdate({_id: productId}, {$set: updatedBody});
         if (updatedProduct) {
             res.status(200).json({message:"Product updated successfully"});
@@ -100,6 +110,11 @@ router.put('/edit', adminAuth, async (req, res) => {
 router.delete('/delete/:id', adminAuth, async (req, res) => {
     try {
         if (req.params.id) {
+            let isValid = mongoose.Types.ObjectId.isValid(productId);
+            if (!isValid) {
+                res.status(400).json({ message: 'Invalid Product Id'});
+                return;
+            }
             let deletedProduct = await Product.findOneAndDelete({_id: req.params.id});
             if (deletedProduct) {
                 res.status(200).json({message:"Product Deleted successfully"});
