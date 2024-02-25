@@ -41,7 +41,7 @@ router.post('/add/:productId', userAuth, async (req, res) => {
     }
 });
 
-router.post('/remove/:productId', userAuth, async (req, res) => {
+router.delete('/remove/:productId', userAuth, async (req, res) => {
     try {
         let userId = req.userId;
         let productId = req.params.productId;
@@ -50,8 +50,13 @@ router.post('/remove/:productId', userAuth, async (req, res) => {
             res.status(400).json({ message: 'Invalid Product Id'});
             return;
         }
-        let user = await User.findOneAndUpdate({_id: userId}, {$pull: {cart: productId}});
-        if (user) {
+        let user = await User.findOne({_id: userId});
+        if (!user) { return res.status(400).json({ message: 'User not found' }); }
+        let cart = user.cart;
+        let index = cart.indexOf(productId);
+        cart.splice(index, 1);
+        let updateCart = await User.findOneAndUpdate({_id: userId}, {cart: cart});
+        if (updateCart) {
             res.status(200).json({message: "Product Removed successfully"});
         } else {
             res.status(400).json({message: "failed to remove product from cart"});
@@ -63,7 +68,7 @@ router.post('/remove/:productId', userAuth, async (req, res) => {
 });
 
 // empty cart
-router.post('/removeAll', userAuth, async (req, res)=> {
+router.delete('/removeAll', userAuth, async (req, res)=> {
     try {
         let userId = req.userId;
         let user = await User.findOne({_id: userId})

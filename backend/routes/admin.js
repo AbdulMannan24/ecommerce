@@ -151,6 +151,11 @@ router.delete('/deleteUser/:id?', adminAuth, async (req, res) => {
         let user = req.params.id;
         user = new mongoose.Types.ObjectId(user);
         if (user) {
+            let isValid = mongoose.Types.ObjectId.isValid(user);
+            if (!isValid) {
+                res.status(400).json({ message: 'Invalid User Id'});
+                return;
+            }
             let {deletedCount} = await User.deleteOne({_id: user});
 
             if (deletedCount) {

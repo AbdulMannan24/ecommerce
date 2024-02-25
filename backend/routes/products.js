@@ -16,7 +16,6 @@ router.get('/:id?', async (req, res) => {
                 return;
             }
             let product = await Product.findOne({_id: productId});
-            console.log(product + ' is available');
             res.status(200).json({product});
             return;
         } 
