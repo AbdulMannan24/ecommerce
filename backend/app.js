@@ -14,6 +14,9 @@ app.use(countRequests);
 const mainRouter = require('./routes/index');
 app.use('/api/v1/', mainRouter);
 
+app.get('/', (req, res) => {
+    res.send("please use /api/v1/ for all routes");
+});
 app.listen(port, ()=>{
     console.log('server started: '+ port);
     connectDB();
