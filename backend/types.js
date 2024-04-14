@@ -21,7 +21,7 @@ const orderBody = zod.object({
 
 const productBody = zod.object({
     name: zod.string(),
-    price: zod.number()
+    price: zod.string()
 })
 
 module.exports = {

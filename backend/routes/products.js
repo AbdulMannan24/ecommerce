@@ -12,7 +12,7 @@ router.get('/:id?', async (req, res) => {
         if (productId) {
             let isValid = mongoose.Types.ObjectId.isValid(productId);
             if (!isValid) {
-                res.status(400).json({ message: 'Invalid Product Id'});
+                res.json({ message: 'Invalid Product Id'});
                 return;
             }
             let product = await Product.findOne({_id: productId});
@@ -23,7 +23,7 @@ router.get('/:id?', async (req, res) => {
         res.status(200).json({products});        
     } catch (err) {
         console.log(err);
-        res.status(400).json({message: "Api Call Failed"});
+        res.json({message: "Api Call Failed"});
     }
 });
 
@@ -31,6 +31,7 @@ router.get('/:id?', async (req, res) => {
 router.get('/search/:name', async (req, res) => {
     try {
         let productName = req.params.name;
+        console.log(productName);
         if (productName) {
             let products = await Product.find({ 
                 name: { 
@@ -45,11 +46,11 @@ router.get('/search/:name', async (req, res) => {
                 res.status(200).json({message: 'No products found'});
             }
         } else {
-            res.status(400).json({message: "Product Name invalid"});
+            res.json({message: "Product Name invalid"});
         } 
     } catch (err) {
         console.log(err);
-        res.status(400).json({message: "Api Call Failed"});  
+        res.json({message: "Api Call Failed"});  
     }
 });
 
@@ -58,7 +59,8 @@ router.post('/add', adminAuth, async (req, res) => {
     try {
         let { success } = productBody.safeParse(req.body);
         if (!success) {
-            res.status(400).json({message: "Invalid Product Input"});
+            console.log(req.body);
+            res.json({message: "Invalid Product Input"});
             return;
         }
 
@@ -73,13 +75,13 @@ router.post('/add', adminAuth, async (req, res) => {
         })
 
         if (addProduct) {
-            res.status(200).json({message:"Product Added successfully"});
+            res.status(200).json({message:"success"});
         } else {
-            res.status(400).json({message: "Failed to Add Product"});
+            res.json({message: "Failed to Add Product"});
         }
     } catch (err) {
         console.log(err);
-        res.status(400).json({message: "Api Call Failed"}); 
+        res.json({message: "Api Call Failed"}); 
     }
 })
 
@@ -90,18 +92,18 @@ router.put('/edit', adminAuth, async (req, res) => {
         let productId = req.body.id;
         let isValid = mongoose.Types.ObjectId.isValid(productId);
         if (!isValid) {
-            res.status(400).json({ message: 'Invalid Product Id'});
+            res.json({ message: 'Invalid Product Id'});
             return;
         }
         let updatedProduct = await Product.findOneAndUpdate({_id: productId}, {$set: updatedBody});
         if (updatedProduct) {
             res.status(200).json({message:"Product updated successfully"});
         } else {
-            res.status(400).json({message: "Failed to update Product"});
+            res.json({message: "Failed to update Product"});
         }
     } catch (err) {
         console.log(err);
-        res.status(400).json({message: "Api Call Failed"}); 
+        res.json({message: "Api Call Failed"}); 
     }
 });
 
@@ -109,14 +111,15 @@ router.put('/edit', adminAuth, async (req, res) => {
 router.delete('/delete/:id', adminAuth, async (req, res) => {
     try {
         if (req.params.id) {
+            let productId = req.params.id;
             let isValid = mongoose.Types.ObjectId.isValid(productId);
             if (!isValid) {
-                res.status(400).json({ message: 'Invalid Product Id'});
+                res.json({ message: 'Invalid Product Id'});
                 return;
             }
             let deletedProduct = await Product.findOneAndDelete({_id: req.params.id});
             if (deletedProduct) {
-                res.status(200).json({message:"Product Deleted successfully"});
+                res.status(200).json({message:"success"});
             } else {
                 res.status(404).json({message: "Product Not Found"});
             }
@@ -125,7 +128,7 @@ router.delete('/delete/:id', adminAuth, async (req, res) => {
         }
     } catch (err) {
         console.log(err);
-        res.status(400).json({message: "Invalid product Id/ Product not found"}); 
+        res.json({message: "Invalid product Id/ Product not found"}); 
     }
 });
 

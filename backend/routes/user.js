@@ -12,10 +12,10 @@ router.get('/me', userAuth, async (req, res) => {
     try {
         let user = await User.findOne({_id : req.userId}).select('-password');
         if (user) {
-            res.status(200).json(user);
+            res.status(200).json({user});
             return;
         } else {
-            res.status(500).json({message:"failed to fetch user"});
+            res.json({message:"failed to fetch user"});
         }
     } catch (err) {
         console.log(err);
@@ -27,14 +27,14 @@ router.post('/signUp', async (req, res) => {
     try {
         const {success} = signUpBody.safeParse(req.body);
         if (!success) {
-            res.status(404).json({message:"Invalid Details"});
+            res.json({message:"Invalid Details"});
             return;
         }
 
         // checking for existing user
         let userExists = await fetchUser(req.body.email);
         if (userExists) {
-            res.status(404).json({message:"User already exists"});
+            res.json({message:"User already exists"});
             return;
         }
 
@@ -56,12 +56,12 @@ router.post('/signUp', async (req, res) => {
             }, process.env.SECRET_KEY);
 
             res.status(200).json({
-                message: "user created successfully",
+                message: "success",
                 token: token
             });
         } else {
             console.log(createdUser);
-            res.status(500).json({message:"failed to create user"});
+            res.json({message:"failed to create user"});
         }
     } catch (err) {
         console.log(err);
@@ -70,17 +70,17 @@ router.post('/signUp', async (req, res) => {
 });
 
 
-router.post('/login', async (req, res) => {
+router.post('/signin', async (req, res) => {
     try {
         let {success} = loginBody.safeParse(req.body);
         if (!success) {
-            res.status(400).json({message: "Invalid Credentials"});
+            res.json({message: "Invalid Credentials"});
             return;
         }
 
         let userExists = await fetchUser(req.body.email);
         if (!userExists) {
-            res.status(404).json({message: "User does not exist"});
+            res.json({message: "User does not exist"});
             return;
         }
 
@@ -90,10 +90,11 @@ router.post('/login', async (req, res) => {
                 userId: userExists._id,
             }, process.env.SECRET_KEY);
             return res.status(200).json({
+                message: "success",
                 token: token
             })
         } else {
-            return res.status(411).json({
+            return res.json({
                 message: "Password is incorrect"
             })
         }        
@@ -126,7 +127,7 @@ router.put('/edit', userAuth, async (req, res) => {
                 await User.updateOne({_id: userId}, {password: hash});
                 edited = true;
             } else {
-                res.status(400).json({message:"The password must be at least 6 characters"});
+                res.json({message:"The password must be at least 6 characters"});
                 return;
             }
         }
@@ -134,7 +135,7 @@ router.put('/edit', userAuth, async (req, res) => {
         if (edited) {
             res.status(200).json({message:"Profile updated successfuly"});
         } else {
-            res.status(500).json({message:"failed to update user"});
+            res.json({message:"failed to update user"});
         }
     } catch (err) {
         console.log(err);
@@ -149,7 +150,7 @@ router.delete('/delete', userAuth, async (req, res) => {
         if (deletedCount) {
             res.status(200).json({message:"User deleted successfully"});
         } else {
-            res.status(404).json({message: "failed to delete user"});
+            res.json({message: "failed to delete user"});
         }
     } catch (err) {
         console.log(err);

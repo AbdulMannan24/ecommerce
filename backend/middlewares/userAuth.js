@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 function userAuth(req, res, next) {
     try{
         let authHeader = req.headers.authorization;
-
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
             return res.status(403).json({
                 message: 'Invalid Bearer token'

@@ -57,17 +57,17 @@ router.post('/signUp', async (req, res) => {
 });
 
 
-router.post('/login', async (req, res) => {
+router.post('/signin', async (req, res) => {
     try {
         let {success} = loginBody.safeParse(req.body);
         if (!success) {
-            res.status(400).json({message: "Invalid Credentials"});
+            res.json({message: "Invalid Credentials"});
             return;
         }
 
         let userExists = await fetchAdmin(req.body.email);
         if (!userExists) {
-            res.status(404).json({message: "Admin does not exist"});
+            res.json({message: "Admin does not exist"});
             return;
         }
 
@@ -78,10 +78,11 @@ router.post('/login', async (req, res) => {
                 isAdmin: true
             }, process.env.SECRET_KEY);
             return res.status(200).json({
+                message: "success",
                 token: token
             })
         } else {
-            return res.status(411).json({
+            return res.json({
                 message: "Password is incorrect"
             })
         }        
@@ -115,7 +116,7 @@ router.put('/edit', adminAuth, async (req, res) => {
                 await Admin.updateOne({_id: userId}, {password: hash});
                 edited = true;
             } else {
-                res.status(400).json({message:"The password must be at least 6 characters"});
+                res.json({message:"The password must be at least 6 characters"});
                 return;
             }
         }
@@ -136,9 +137,9 @@ router.get('/allusers', adminAuth, async (req, res) => {
     try {
         let users = await User.find().select('-password');
         if (users.length > 0) {
-            res.json(users);
+            res.json({users});
         } else {
-            res.status(404).json({message: "No Users found"});
+            res.json({message: "No Users found"});
         }
     } catch (err) {
         console.log(err);
@@ -153,7 +154,7 @@ router.delete('/deleteUser/:id?', adminAuth, async (req, res) => {
         if (user) {
             let isValid = mongoose.Types.ObjectId.isValid(user);
             if (!isValid) {
-                res.status(400).json({ message: 'Invalid User Id'});
+                res.json({ message: 'Invalid User Id'});
                 return;
             }
             let {deletedCount} = await User.deleteOne({_id: user});
@@ -166,7 +167,7 @@ router.delete('/deleteUser/:id?', adminAuth, async (req, res) => {
                 return;
             }
         }
-        res.status(400).json({message: "Provide a valid User ID"});
+        res.json({message: "Provide a valid User ID"});
     } catch (err) {
         console.log(err);
         res.json({message: "Api Call Failed"}); 
