@@ -15,7 +15,6 @@ export default function SignIn() {
                 email,
                 password
             });
-            // Handle success
             if (response.data.message === "success") {
                 localStorage.setItem("token", response.data.token);
                 navigate("/products");
@@ -23,7 +22,6 @@ export default function SignIn() {
                 window.alert(response.data.message);
             }
         } catch (error) {
-            // Handle error
             console.error(error);
             window.alert("Back End error" + error);
         }
