@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import SignIn from './pages/SignIn'
@@ -14,8 +14,10 @@ import AddProduct from './pages/AddProduct';
 import Users from './pages/Users';
 
 function App() {
-  const [count, setCount] = useState(0)
-  
+  const [count, setCount] = useState(0);
+  useEffect(()=> {
+    window.alert("for Testing,can also use Email: 'testing@gmail.com' & password: 'testing' , first Api request might take 50seconds to activate Free Instance,Thank you");
+  },[count])
   return (
     <>
       <Router>
